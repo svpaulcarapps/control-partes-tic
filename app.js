@@ -25,4 +25,4 @@ $('disable').onclick=async()=>{if(busy||!token||!sub)return;busy=true;render(tru
 $('test').onclick=async()=>{if(busy||!token||!sub)return;busy=true;render(true);try{await api('/test',sub.toJSON());status('Prueba enviada a este dispositivo. No se ha creado ningún parte.');}catch(e){status(e.message);}finally{busy=false;render(!!sub);}};
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js',{scope:'./'}).then(r=>registration=r).catch(()=>{});
 
-if(!SETTINGS){const panelURL=$('direct').href;const go=()=>location.replace(panelURL);if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js',{scope:'./'}).then(go,go);else go();setTimeout(go,1200);}
+if(!SETTINGS){document.querySelector("main").hidden=true;document.querySelector(".panel-tools").hidden=true;$("panelFallback").hidden=false;document.querySelector("main").before($("panelFallback"));}

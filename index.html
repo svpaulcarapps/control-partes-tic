@@ -1,1 +1,323 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#b52c2c"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Control TIC"><title>Control de Partes TIC</title><link rel="icon" type="image/png" href="icon.png"><link rel="apple-touch-icon" href="icon.png"><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="style.css"><script src="app.js" defer></script></head><body><header><img src="icon.png" alt="Icono de Control de Partes TIC"><div><h1>Control de Partes TIC</h1><p>Colegio San Vicente de Paúl · Cartagena</p></div><a class="panel-link" href="https://script.google.com/a/macros/svpaulcar.es/s/AKfycbyiV7fJTCLccnCvh-AXdbjFw5uhDBBUIY1FBqMMNHlkcLwu7jg70xT1tkBRtTzSZ1qO/exec">Abrir panel ↗</a><button id="install" hidden>Instalar app</button><button id="notifications" aria-expanded="false" aria-controls="notificationPanel">🔔 Avisos</button></header><section id="notificationPanel" class="notice" hidden><h2>Instalación y avisos de Control TIC</h2><p>Para guardar tu icono en el móvil, abre el menú del navegador y elige «Añadir a pantalla de inicio». En ordenador, usa «Instalar app» si aparece o la opción de instalación del navegador.</p><p>Recibe una notificación cuando se registre un parte TIC. Los avisos de gestión se conectan con tu cuenta del colegio.</p><div class="actions"><button id="connect">Conectar con mi cuenta de Google</button><button id="enable" disabled>Activar avisos en este dispositivo</button><button id="test" hidden>Probar aviso</button><button id="disable" hidden>Desactivar avisos</button></div><p id="pushStatus" role="status">Abre el panel con tu cuenta del colegio para conectar los avisos.</p><p id="iosHint" hidden>En iPhone o iPad: comparte esta página en Safari, elige «Añadir a pantalla de inicio» y abre la app desde su icono para activar los avisos.</p></section><div class="panel-tools"><span>Panel de incidencias</span><a id="direct" target="_blank" rel="noopener noreferrer" href="https://script.google.com/a/macros/svpaulcar.es/s/AKfycbyiV7fJTCLccnCvh-AXdbjFw5uhDBBUIY1FBqMMNHlkcLwu7jg70xT1tkBRtTzSZ1qO/exec">Abrir panel en otra ventana ↗</a></div><main><section id="panelFallback" class="panel-fallback" hidden><img src="icon.png" alt=""><h2>Tu panel de partes TIC</h2><p>Guarda esta página en tu pantalla de inicio para tener Control TIC con su icono propio. Después, pulsa el botón para consultar y gestionar los partes.</p><button id="openPanel">Abrir mi panel TIC ↗</button></section><iframe id="panel" title="Gestión de partes TIC" src="https://script.google.com/a/macros/svpaulcar.es/s/AKfycbyiV7fJTCLccnCvh-AXdbjFw5uhDBBUIY1FBqMMNHlkcLwu7jg70xT1tkBRtTzSZ1qO/exec" allow="clipboard-write"></iframe></main><footer>Control TIC · Colegio San Vicente de Paúl · Cartagena</footer></body></html>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"><title>Control de Partes TIC</title><meta name="theme-color" content="#b52c2c"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Control TIC"><link rel="icon" href="icon.png"><link rel="apple-touch-icon" href="icon.png"><link rel="manifest" href="manifest.webmanifest"><script>window.NATIVE_APP_CONFIG={"service": "tic", "title": "Control de Partes TIC", "icon": "./icon.png", "loginURL": "https://script.google.com/a/macros/svpaulcar.es/s/AKfycbyiV7fJTCLccnCvh-AXdbjFw5uhDBBUIY1FBqMMNHlkcLwu7jg70xT1tkBRtTzSZ1qO/exec"};</script><script src="native-api.js?v=1"></script><script src="tic-notifications.js?v=1" defer></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <style>
+    body { background-color: #f8f9fa; font-family: system-ui, -apple-system, sans-serif; }
+    .card-incidencia { border-radius: 12px; transition: transform 0.2s; border-left: 6px solid #6c757d; }
+    .card-incidencia:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .prioridad-Alta { border-left-color: #dc3545 !important; }
+    .prioridad-Media { border-left-color: #ffc107 !important; }
+    .prioridad-Baja { border-left-color: #0d6efd !important; }
+    .badge-alta { background-color: #dc3545; }
+    .badge-media { background-color: #ffc107; color: #000; }
+    .badge-baja { background-color: #0d6efd; }
+    .stat-card { border-radius: 12px; background: white; padding: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+    .tic-header { display:flex; justify-content:space-between; align-items:center; gap:20px; }
+    .tic-brand { display:flex; align-items:center; gap:14px; min-width:0; }
+    .tic-brand-copy { min-width:0; }
+    .tic-brand h1 { font-size:1.4rem; line-height:1.2; margin:0 0 4px; font-weight:700; }
+    .tic-brand small { display:block; line-height:1.4; }
+    .tic-actions { display:flex; gap:8px; flex-shrink:0; }
+    .tic-actions .btn { min-height:44px; display:inline-flex; justify-content:center; align-items:center; gap:6px; }
+    @media (max-width:600px) {
+      body { padding:12px !important; }
+      .container-fluid { padding:0; }
+      .tic-header { flex-direction:column; align-items:stretch; gap:14px; padding:16px !important; margin-bottom:20px !important; }
+      .tic-brand { gap:12px; }
+      .tic-brand .header-logo { width:54px; height:54px; border-radius:14px; flex:0 0 54px; }
+      .tic-brand h1 { font-size:1.16rem; }
+      .tic-brand small { font-size:.75rem; }
+      .tic-actions { display:grid; grid-template-columns:1fr 1fr; width:100%; }
+      .tic-actions .btn { font-size:.875rem; padding:10px 8px; }
+    }
+    .header-logo { height: 68px; width:68px; object-fit:contain; border-radius:16px; }
+    
+    .img-preview-container {
+      width: 100%;
+      border-radius: 10px;
+      background-color: #f8f9fa;
+      padding: 6px;
+      border: 1px solid #dee2e6;
+      text-align: center;
+    }
+    .img-preview {
+      width: 100%;
+      height: auto;
+      max-height: 280px;
+      object-fit: contain;
+      border-radius: 6px;
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+    .img-preview:hover {
+      transform: scale(1.02);
+    }
+  </style>
+</head>
+<body class="p-3 p-md-4">
+  <div class="container-fluid">
+    <!-- Cabecera con Logo del Colegio -->
+    <div class="tic-header mb-4 bg-white p-3 rounded-3 shadow-sm">
+      <div class="tic-brand">
+        <img src="https://svpaulcarapps.github.io/san-vicente-apps/parte-tic.png" alt="Icono de Control de Partes TIC" class="header-logo">
+        <div class="tic-brand-copy">
+          <h1 class="text-dark">Control de Partes TIC</h1>
+          <small class="text-muted">Colegio Concertado San Vicente de Paúl</small>
+        </div>
+      </div>
+      <div class="tic-actions"><button id="ticAvisos" class="btn btn-outline-secondary" type="button">🔔 Avisos</button><button class="btn btn-outline-primary" onclick="cargarDatos()"><i class="bi bi-arrow-clockwise"></i> Actualizar</button></div>
+    </div>
+
+    <!-- Dashboard de Estadísticas (En proceso en Azul) -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="stat-card border-start border-4 border-warning">
+          <div class="text-muted small">Pendientes</div>
+          <div class="h3 mb-0" id="stat-pendientes">0</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card border-start border-4 border-primary">
+          <div class="text-muted small">En proceso</div>
+          <div class="h3 mb-0" id="stat-proceso">0</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card border-start border-4 border-success">
+          <div class="text-muted small">Resueltos</div>
+          <div class="h3 mb-0" id="stat-resueltos">0</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card border-start border-4 border-danger">
+          <div class="text-muted small">Urgencias (Alta)</div>
+          <div class="h3 mb-0" id="stat-urgentes">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4 p-3 shadow-sm">
+      <div class="row g-2">
+        <div class="col-md-3">
+          <label class="form-label small fw-bold mb-1">📅 Curso / Hoja:</label>
+          <select id="selectHoja" class="form-select" onchange="cargarDatos()"></select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-bold mb-1">🔍 Buscar:</label>
+          <input type="text" id="filterText" class="form-control" placeholder="Ubicación, descripción..." oninput="filtrarPartes()">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-bold mb-1">📌 Estado:</label>
+          <select id="filterEstado" class="form-select" onchange="filtrarPartes()">
+            <option value="PendientesYProceso" selected>Pendientes y En proceso</option>
+            <option value="Todos">Todos los estados</option>
+            <option value="Pendiente">Solo Pendientes</option>
+            <option value="En proceso">Solo En proceso</option>
+            <option value="Resuelto">Solo Resueltos</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-bold mb-1">🚨 Prioridad:</label>
+          <select id="filterPrioridad" class="form-select" onchange="filtrarPartes()">
+            <option value="Todas" selected>Todas las prioridades</option>
+            <option value="Alta">Alta 🔴</option>
+            <option value="Media">Media 🟡</option>
+            <option value="Baja">Baja 🔵</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de Partes -->
+    <div id="loading" class="text-center my-5">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="mt-2 text-muted">Cargando incidencias...</p>
+    </div>
+
+    <div class="row g-3" id="listaPartes"></div>
+  </div>
+
+  <script>
+    let todosLosPartes = [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      google.script.run
+        .withSuccessHandler(hojas => {
+          const select = document.getElementById("selectHoja");
+          select.innerHTML = "";
+          if (hojas && hojas.length > 0) {
+            hojas.forEach(h => {
+              const opt = document.createElement("option");
+              opt.value = h;
+              opt.innerText = h;
+              if (h.includes("2026-2027")) opt.selected = true;
+              select.appendChild(opt);
+            });
+          } else {
+            const opt = document.createElement("option");
+            opt.value = "Curso 2026-2027";
+            opt.innerText = "Curso 2026-2027";
+            select.appendChild(opt);
+          }
+          cargarDatos();
+        })
+        .withFailureHandler(err => {
+          console.error("Error al obtener hojas:", err);
+          cargarDatos();
+        })
+        .obtenerHojasCursos();
+    });
+
+    function cargarDatos() {
+      document.getElementById("loading").classList.remove("d-none");
+      document.getElementById("listaPartes").innerHTML = "";
+      const selectHoja = document.getElementById("selectHoja");
+      const hojaElegida = selectHoja && selectHoja.value ? selectHoja.value : "";
+      
+      google.script.run
+        .withSuccessHandler(renderizarPartes)
+        .withFailureHandler(err => {
+          document.getElementById("loading").classList.add("d-none");
+          document.getElementById("listaPartes").innerHTML = `<div class="col-12 text-center text-danger py-5">Error de conexión: ${err.message}</div>`;
+        })
+        .obtenerPartesTIC(hojaElegida);
+    }
+
+    function renderizarPartes(partes) {
+      todosLosPartes = partes || [];
+      document.getElementById("loading").classList.add("d-none");
+      actualizarEstadisticas();
+      filtrarPartes();
+    }
+
+    function actualizarEstadisticas() {
+      document.getElementById("stat-pendientes").innerText = todosLosPartes.filter(p => p.estado === "Pendiente").length;
+      document.getElementById("stat-proceso").innerText = todosLosPartes.filter(p => p.estado === "En proceso").length;
+      document.getElementById("stat-resueltos").innerText = todosLosPartes.filter(p => p.estado === "Resuelto").length;
+      document.getElementById("stat-urgentes").innerText = todosLosPartes.filter(p => p.prioridad === "Alta" && p.estado !== "Resuelto").length;
+    }
+
+    function obtenerDriveDirectUrl(url) {
+      if (!url) return null;
+      const matchId = url.match(/[-\w]{25,}/);
+      if (matchId) {
+        return `https://lh3.googleusercontent.com/d/${matchId[0]}`;
+      }
+      return null;
+    }
+
+    function escapeHtml(value){return String(value??" ").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+    function safeImageURL(value){try{const u=new URL(value);return u.protocol==="https:"?u.href:"";}catch{return "";}}
+    function filtrarPartes() {
+      const texto = document.getElementById("filterText").value.toLowerCase();
+      const estadoFiltro = document.getElementById("filterEstado").value;
+      const prioridadFiltro = document.getElementById("filterPrioridad").value;
+
+      const filtrados = todosLosPartes.filter(p => {
+        const matchTexto = p.ubicacion.toLowerCase().includes(texto) || p.descripcion.toLowerCase().includes(texto) || p.email.toLowerCase().includes(texto);
+        
+        let matchEstado = true;
+        if (estadoFiltro === "PendientesYProceso") matchEstado = p.estado !== "Resuelto";
+        else if (estadoFiltro !== "Todos") matchEstado = p.estado === estadoFiltro;
+
+        let matchPrioridad = (prioridadFiltro === "Todas") || (p.prioridad === prioridadFiltro);
+
+        return matchTexto && matchEstado && matchPrioridad;
+      });
+
+      const contenedor = document.getElementById("listaPartes");
+      contenedor.innerHTML = "";
+
+      if (filtrados.length === 0) {
+        contenedor.innerHTML = `<div class="col-12 text-center text-muted py-5">No hay incidencias que coincidan con los filtros.</div>`;
+        return;
+      }
+
+      filtrados.forEach(p => {
+        const badgePrioridad = p.prioridad === "Alta" ? "badge-alta" : (p.prioridad === "Baja" ? "badge-baja" : "badge-media");
+        
+        let fotoHtml = "";
+        const photo=safeImageURL(p.fotoUrl),preview=safeImageURL(obtenerDriveDirectUrl(photo));
+        if(photo)fotoHtml=`<div class="my-2"><a href="${escapeHtml(photo)}" target="_blank" rel="noopener noreferrer" title="Ver imagen adjunta">${preview?`<img src="${escapeHtml(preview)}" class="img-preview" alt="Imagen adjunta al parte" loading="lazy">`:'Ver imagen adjunta ↗'}</a></div>`;
+
+        const card = document.createElement("div");
+        card.className = "col-12 col-md-6 col-lg-4";
+        card.innerHTML = `
+          <div class="card card-incidencia prioridad-${escapeHtml(p.prioridad)} h-100 p-3 bg-white shadow-sm">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge ${badgePrioridad}">${escapeHtml(p.prioridad || 'Media')}</span>
+              <small class="text-muted fw-bold">${escapeHtml(p.fecha)}</small>
+            </div>
+            
+            <h5 class="fw-bold mb-2 text-dark">${escapeHtml(p.ubicacion)} <small class="text-muted fs-6">(${escapeHtml(p.etapa)})</small></h5>
+            
+            <!-- Título y Descripción de la Avería -->
+            <div class="bg-light p-2 rounded mb-2 border-start border-3 border-primary">
+              <span class="d-block small fw-bold text-primary mb-1"><i class="bi bi-exclamation-triangle"></i> Descripción de la avería:</span>
+              <span class="text-dark small">${escapeHtml(p.descripcion)}</span>
+            </div>
+
+            <small class="text-muted d-block mb-1"><i class="bi bi-person"></i> ${escapeHtml(p.email)}</small>
+            
+            ${fotoHtml}
+            
+            <hr class="my-2">
+            
+            <div class="mb-2">
+              <label class="form-label small fw-bold mb-1">Estado:</label>
+              <select id="estado-${p.fila}" class="form-select form-select-sm">
+                <option value="Pendiente" ${p.estado === "Pendiente" ? "selected" : ""}>🔴 Pendiente</option>
+                <option value="En proceso" ${p.estado === "En proceso" ? "selected" : ""}>🔵 En proceso</option>
+                <option value="Resuelto" ${p.estado === "Resuelto" ? "selected" : ""}>🟢 Resuelto</option>
+              </select>
+            </div>
+            
+            <div class="mb-2">
+              <label class="form-label small fw-bold mb-1">Prioridad:</label>
+              <select id="prioridad-${p.fila}" class="form-select form-select-sm">
+                <option value="Alta" ${p.prioridad === "Alta" ? "selected" : ""}>🔴 Alta</option>
+                <option value="Media" ${p.prioridad === "Media" ? "selected" : ""}>🟡 Media</option>
+                <option value="Baja" ${p.prioridad === "Baja" ? "selected" : ""}>🔵 Baja</option>
+              </select>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label small fw-bold mb-1">Observaciones TIC:</label>
+              <textarea id="obs-${p.fila}" class="form-control form-control-sm" rows="2" placeholder="Escribe notas para el profesor...">${escapeHtml(p.observaciones)}</textarea>
+            </div>
+            
+            <button class="btn btn-primary btn-sm w-100" data-save-part><i class="bi bi-save"></i> Guardar Cambios</button>
+          </div>
+        `;
+        card.querySelector("[data-save-part]").onclick=()=>guardar(p.hoja,p.fila);
+        contenedor.appendChild(card);
+      });
+    }
+
+    function guardar(hoja, fila) {
+      const nuevoEstado = document.getElementById(`estado-${fila}`).value;
+      const nuevaPrioridad = document.getElementById(`prioridad-${fila}`).value;
+      const observaciones = document.getElementById(`obs-${fila}`).value;
+
+      google.script.run
+        .withSuccessHandler(res => {
+          if (res.success) {
+            cargarDatos();
+          } else {
+            alert("Error guardando cambios: " + res.error);
+          }
+        })
+        .withFailureHandler(err => alert("Error al conectar con el servidor: " + err.message))
+        .guardarCambiosParte(hoja, fila, nuevoEstado, nuevaPrioridad, observaciones);
+    }
+  
+
+</script>
+<dialog id="tic-notifications-dialog" style="max-width:480px;width:calc(100% - 28px);border:1px solid #dbe3ed;border-radius:20px;padding:24px;color:#17334f"><h2 class="h4">Avisos de Control TIC</h2><p>Recibe una notificación cuando entre un parte nuevo.</p><p id="accountEmail" class="small text-secondary"></p><div class="d-grid gap-2"><button id="enable" class="btn btn-primary" disabled>Activar avisos en este dispositivo</button><button id="test" class="btn btn-outline-primary" hidden>Probar aviso</button><button id="disable" class="btn btn-outline-danger" hidden>Desactivar avisos</button><button id="connect" class="btn btn-outline-secondary">Conectar mi cuenta</button></div><p id="pushStatus" role="status" class="my-3">Conectando avisos…</p><button id="closeNotifications" class="btn btn-secondary w-100">Volver al panel</button></dialog></body>
+</html>

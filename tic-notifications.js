@@ -1,0 +1,19 @@
+(()=>{'use strict';
+ const API='https://svpaulcar-apps-api.carlos-mercader-conesa.workers.dev/tic',by=id=>document.getElementById(id);let credential='',registration=null,subscription=null,busy=false;
+ const dialog=by('tic-notifications-dialog'),status=text=>by('pushStatus').textContent=text;
+ function render(active){by('enable').hidden=active;by('test').hidden=!active;by('disable').hidden=!active;for(const id of ['enable','test','disable'])by(id).disabled=busy||!credential;by('ticAvisos').textContent=active?'🔔 Avisos activos':'🔔 Avisos';}
+ async function api(path,data,method='POST'){const r=await fetch(API+path,{method,cache:'no-store',headers:{'Content-Type':'application/json',Authorization:'Bearer '+credential},body:JSON.stringify(data)}),body=await r.json();if(!r.ok)throw Error(body.error||'No se pudo completar la operación.');return body;}
+ function bytes(s){return Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/').padEnd(Math.ceil(s.length/4)*4,'=')),c=>c.charCodeAt(0));}
+ async function setup(){
+  if(!('serviceWorker'in navigator)||!('PushManager'in window)||!('Notification'in window))throw Error('En iPhone o iPad, añade esta app a la pantalla de inicio desde Safari y ábrela desde su icono para activar los avisos.');
+  registration=await navigator.serviceWorker.register('./sw.js',{scope:'./'});await navigator.serviceWorker.ready;return registration;
+ }
+ async function restore(){try{await NativeApp.ready;by('accountEmail').textContent=NativeApp.email;credential=(await NativeApp.rpc('obtenerCredencialPushTic')).token;await setup();subscription=await registration.pushManager.getSubscription();const active=subscription&&(await api('/status',subscription.toJSON())).registered;render(!!active);status(active?'Este dispositivo recibirá los nuevos partes TIC.':'Activa los avisos para recibir los nuevos partes TIC en este dispositivo.');}catch(e){status(e.message);render(false);}}
+ by('ticAvisos').onclick=()=>{dialog.showModal();restore();};by('closeNotifications').onclick=()=>dialog.close();
+ by('connect').onclick=()=>NativeApp.connect().then(restore).catch(e=>status(e.message));
+ by('enable').onclick=async()=>{if(busy)return;busy=true;render(false);try{await setup();const permission=await Notification.requestPermission();if(permission!=='granted')throw Error('Permite las notificaciones de esta app en los ajustes del dispositivo.');const c=await fetch(API+'/config',{cache:'no-store'}).then(r=>r.json());if(!c.enabled||!c.publicKey)throw Error('El servicio de avisos no está disponible.');subscription=await registration.pushManager.getSubscription()||await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:bytes(c.publicKey)});await api('/subscriptions',subscription.toJSON());status('Avisos activados en este dispositivo.');}catch(e){status(e.message);}finally{busy=false;if(subscription){try{render((await api('/status',subscription.toJSON())).registered);}catch{render(false);}}else render(false);}};
+ by('test').onclick=async()=>{if(busy||!subscription)return;busy=true;render(true);try{await api('/test',subscription.toJSON());status('Prueba enviada a este dispositivo. No se ha creado ningún parte.');}catch(e){status(e.message);}finally{busy=false;render(true);}};
+ by('disable').onclick=async()=>{if(busy||!subscription)return;busy=true;render(true);try{await api('/subscriptions',subscription.toJSON(),'DELETE');await subscription.unsubscribe();subscription=null;status('Avisos desactivados en este dispositivo.');}catch(e){status(e.message);}finally{busy=false;render(!!subscription);}};
+ window.addEventListener('native-account-connected',restore);NativeApp.ready.then(restore);render(false);
+ if(new URL(location.href).searchParams.has('ajustes'))dialog.showModal();
+})();

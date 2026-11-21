@@ -58,20 +58,11 @@
       transform: scale(1.02);
     }
   </style>
+<style id="svp-hdr-css">.svp-hdr{display:flex!important;flex-direction:row!important;justify-content:flex-start!important;align-items:center;gap:16px;background:#004379!important;color:#fff!important;border:0;border-bottom:5px solid #EDAB00!important;border-radius:16px!important;padding:20px 22px!important;box-sizing:border-box;font-family:Arial,system-ui,sans-serif;text-align:left;box-shadow:0 8px 22px rgba(0,67,121,.16)!important}.svp-hdr>div{margin:0!important;text-align:left!important;flex:0 1 auto}.svp-hdr>.ico{width:62px;height:62px;flex:0 0 62px!important;border-radius:14px;background:#fff;display:flex!important;align-items:center;justify-content:center;overflow:hidden}.svp-hdr .ico img{width:100%;height:100%;object-fit:cover;border-radius:14px}.svp-hdr .eyebrow{color:#EDAB00;font-size:11px;font-weight:bold;letter-spacing:.08em;text-transform:uppercase;line-height:1.3}.svp-hdr h1{margin:2px 0!important;padding:0;font-size:26px!important;letter-spacing:-.5px;color:#fff!important;font-weight:bold;line-height:1.15;font-family:Arial,system-ui,sans-serif}.svp-hdr .who{color:#d9e6f2;font-size:13px;line-height:1.3}.svp-hdr>.acc{margin-left:auto!important;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.svp-hdr .acc .btn,.svp-hdr .acc button{background:#fff!important;color:#004379!important;border:0!important;border-radius:999px!important;font-weight:700;padding:7px 14px!important;font-size:13px!important}.svp-hdr .acc .btn:hover,.svp-hdr .acc button:hover{background:#EDAB00!important;color:#17334f!important}@media(max-width:700px){.svp-hdr{padding:16px!important;gap:12px;flex-wrap:wrap}.svp-hdr h1{font-size:21px!important}.svp-hdr>.ico{width:50px;height:50px;flex-basis:50px!important}.svp-hdr>.acc{margin-left:0!important;width:100%;justify-content:flex-start}}</style>
 </head>
 <body class="p-3 p-md-4">
   <div class="container-fluid">
-    <!-- Cabecera con Logo del Colegio -->
-    <div class="tic-header mb-4 bg-white p-3 rounded-3 shadow-sm">
-      <div class="tic-brand">
-        <img src="https://svpaulcarapps.github.io/san-vicente-apps/parte-tic.png" alt="Icono de Control de Partes TIC" class="header-logo">
-        <div class="tic-brand-copy">
-          <h1 class="text-dark">Control de Partes TIC</h1>
-          <small class="text-muted">Colegio Concertado San Vicente de Paúl</small>
-        </div>
-      </div>
-      <div class="tic-actions"><button id="ticAvisos" class="btn btn-outline-secondary" type="button">🔔 Avisos</button><button class="btn btn-outline-primary" onclick="cargarDatos()"><i class="bi bi-arrow-clockwise"></i> Actualizar</button></div>
-    </div>
+    <header class="svp-hdr mb-4"><div class="ico" aria-hidden="true"><img src="https://svpaulcarapps.github.io/san-vicente-apps/parte-tic.png" alt=""></div><div><div class="eyebrow">San Vicente de Paúl · Infantil y Primaria</div><h1>Control de Partes TIC</h1><div class="who">Incidencias de informática</div></div><div class="acc"><button id="ticAvisos" class="btn btn-outline-secondary" type="button">🔔 Avisos</button><button class="btn btn-outline-primary" onclick="cargarDatos()"><i class="bi bi-arrow-clockwise"></i> Actualizar</button></div></header><img class="header-logo" hidden alt="">
 
     <!-- Dashboard de Estadísticas (En proceso en Azul) -->
     <div class="row g-3 mb-4">
